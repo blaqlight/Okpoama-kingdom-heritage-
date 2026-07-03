@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-display: "Cinzel", serif;
+  
+  /* Traditional Okpoama Royal Gold & Brass Metallurgies */
+  --color-gold-50: #fdfbf7;
+  --color-gold-100: #fbf5e6;
+  --color-gold-200: #f5e6c4;
+  --color-gold-300: #edd39a;
+  --color-gold-400: #e0b667;
+  --color-gold-500: #d4983b;
+  --color-gold-600: #b4782b;
+  --color-gold-700: #8c5a21;
+  --color-gold-800: #67411a;
+  --color-gold-900: #492e15;
+
+  /* Ceremonial Ijaw Coral Bead Crimson (The signature color of traditional royalty, wealth, and prestige) */
+  --color-amber-50: #fff5f3;
+  --color-amber-100: #ffebe6;
+  --color-amber-200: #ffd3cb;
+  --color-amber-300: #ffaf9e;
+  --color-amber-400: #fc7d62;
+  --color-amber-500: #e34c32;
+  --color-amber-600: #c7381f;
+  --color-amber-700: #a62c16;
+  --color-amber-800: #8a2513;
+  --color-amber-900: #722112;
+  --color-amber-950: #410e05;
+
+  /* Traditional Woven Nembe-Ijaw Indigo (The deep ceremonial cloth worn by chiefs and elders) */
+  --color-indigo-50: #f2f7fc;
+  --color-indigo-100: #e1edf8;
+  --color-indigo-200: #cadff1;
+  --color-indigo-300: #a5cae7;
+  --color-indigo-400: #7aaed9;
+  --color-indigo-500: #1d428a;
+  --color-indigo-600: #16326c;
+  --color-indigo-700: #132754;
+  --color-indigo-800: #112044;
+  --color-indigo-900: #0e1834;
+
+  /* Royal Parchment & Woven Thread Neutrals (Replacing cool gray/stone with warm, biological textures) */
+  --color-stone-50: #fdfaf4;
+  --color-stone-100: #f7eedb;
+  --color-stone-200: #eadcca;
+  --color-stone-300: #d5c0ac;
+  --color-stone-400: #bfa48d;
+  --color-stone-500: #9e816a;
+  --color-stone-600: #836752;
+  --color-stone-700: #6b513f;
+  --color-stone-800: #4c382a;
+  --color-stone-900: #33251c;
+  --color-stone-950: #1c130e;
+}
+
+/* Custom 3D Card Flipping utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Animations helper */
+.animate-spin-slow {
+  animation: spin 20s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

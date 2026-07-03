@@ -1,0 +1,6 @@
+{
+  "name": "Okpoama Kingdom Tourism",
+  "description": "An immersive digital portal celebrating the rich culture, seafaring traditions, historical resistance, culinary delicacies, and scenic beaches of Okpoama Kingdom on Brass Island.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
