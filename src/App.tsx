@@ -11,9 +11,10 @@ import { EcotourismGuide } from './components/EcotourismGuide';
 import { PostcardGenerator } from './components/PostcardGenerator';
 import { TriviaQuiz } from './components/TriviaQuiz';
 import VirtualMuseum from './components/VirtualMuseum';
+import { LiveClimateWidget } from './components/LiveClimateWidget';
 import { FESTIVALS, HISTORY, CULINARY, ATTRACTIONS, MUSEUM_ARTIFACTS } from './data/okpoamaData';
 import { Compass, Sparkles, UtensilsCrossed, MapPin, Mail, Award, Anchor, Menu, X, Facebook, Twitter, Link, Map, Globe, Info, HelpCircle, Search, ChevronRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'motion/react';
 
 type ActiveTab = 'overview' | 'culture' | 'culinary' | 'ecotourism' | 'postcard' | 'quiz' | 'museum';
 
@@ -159,6 +160,30 @@ export default function App() {
   const [searchHistoryId, setSearchHistoryId] = useState<string | undefined>(undefined);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // 3D Parallax hover effect for Landmark Details card
+  const cardX = useMotionValue(0.5);
+  const cardY = useMotionValue(0.5);
+
+  const springConfig = { damping: 22, stiffness: 160 };
+  const cardXSpring = useSpring(cardX, springConfig);
+  const cardYSpring = useSpring(cardY, springConfig);
+
+  const rotateX = useTransform(cardYSpring, [0, 1], [8, -8]);
+  const rotateY = useTransform(cardXSpring, [0, 1], [-8, 8]);
+
+  const handleCardMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const xVal = (event.clientX - rect.left) / rect.width;
+    const yVal = (event.clientY - rect.top) / rect.height;
+    cardX.set(xVal);
+    cardY.set(yVal);
+  };
+
+  const handleCardMouseLeave = () => {
+    cardX.set(0.5);
+    cardY.set(0.5);
+  };
 
   // Keyboard shortcut listener for Search (⌘K / Ctrl+K or /)
   useEffect(() => {
@@ -558,89 +583,111 @@ export default function App() {
                 </div>
 
                 {/* Right Column: Dynamic Inspector Details card */}
-                <div className="lg:col-span-4 flex">
-                  {(() => {
-                    const landmark = MAP_LANDMARKS.find(l => l.id === selectedLandmarkId) || MAP_LANDMARKS[0];
-                    return (
-                      <div className="w-full bg-stone-50 border border-stone-200 p-6 rounded-2xl flex flex-col justify-between shadow-xs">
-                        <div className="space-y-4">
-                          <div className="border-b border-stone-200 pb-3">
-                            <span className="text-[10px] font-mono text-amber-700 font-bold uppercase tracking-wider">
-                              {landmark.category}
-                            </span>
-                            <h4 className="font-display font-black text-lg text-stone-900 tracking-tight leading-tight mt-0.5">
-                              {landmark.name}
-                            </h4>
-                          </div>
-
-                          <div className="space-y-3 font-sans text-xs text-stone-600 leading-relaxed">
-                            <p>
-                              {landmark.description}
-                            </p>
-                            
-                            <div className="bg-amber-500/5 border border-amber-500/10 p-3 rounded-xl space-y-1">
-                              <span className="font-mono text-[9px] font-bold text-amber-800 uppercase tracking-widest flex items-center gap-1">
-                                <Info className="w-3.5 h-3.5" /> Historical Significance
+                <div className="lg:col-span-4 flex min-h-[480px]">
+                  <AnimatePresence mode="wait">
+                    {(() => {
+                      const landmark = MAP_LANDMARKS.find(l => l.id === selectedLandmarkId) || MAP_LANDMARKS[0];
+                      return (
+                        <motion.div
+                          key={landmark.id}
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -12 }}
+                          transition={{ duration: 0.22, ease: "easeInOut" }}
+                          onMouseMove={handleCardMouseMove}
+                          onMouseLeave={handleCardMouseLeave}
+                          style={{
+                            rotateX,
+                            rotateY,
+                            transformStyle: "preserve-3d",
+                            perspective: 1000
+                          }}
+                          className="w-full bg-stone-50 border border-stone-200 p-6 rounded-2xl flex flex-col justify-between shadow-xs cursor-default"
+                        >
+                          <div className="space-y-4">
+                            <div className="border-b border-stone-200 pb-3">
+                              <span className="text-[10px] font-mono text-amber-700 font-bold uppercase tracking-wider">
+                                {landmark.category}
                               </span>
-                              <p className="text-[11px] text-stone-700 font-medium">
-                                {landmark.significance}
-                              </p>
+                              <h4 className="font-display font-black text-lg text-stone-900 tracking-tight leading-tight mt-0.5">
+                                {landmark.name}
+                              </h4>
                             </div>
 
-                            <div className="bg-stone-100 p-3 rounded-xl space-y-1">
-                              <span className="font-mono text-[9px] font-bold text-stone-500 uppercase tracking-widest flex items-center gap-1">
-                                <Globe className="w-3.5 h-3.5 text-stone-400" /> Active Tourism Guide
-                              </span>
-                              <p className="text-[11px] text-stone-700 font-medium">
-                                {landmark.activity}
+                            <div className="space-y-3 font-sans text-xs text-stone-600 leading-relaxed">
+                              <p>
+                                {landmark.description}
                               </p>
+                              
+                              <div className="bg-amber-500/5 border border-amber-500/10 p-3 rounded-xl space-y-1">
+                                <span className="font-mono text-[9px] font-bold text-amber-800 uppercase tracking-widest flex items-center gap-1">
+                                  <Info className="w-3.5 h-3.5" /> Historical Significance
+                                </span>
+                                <p className="text-[11px] text-stone-700 font-medium">
+                                  {landmark.significance}
+                                </p>
+                              </div>
+
+                              <div className="bg-stone-100 p-3 rounded-xl space-y-1">
+                                <span className="font-mono text-[9px] font-bold text-stone-500 uppercase tracking-widest flex items-center gap-1">
+                                  <Globe className="w-3.5 h-3.5 text-stone-400" /> Active Tourism Guide
+                                </span>
+                                <p className="text-[11px] text-stone-700 font-medium">
+                                  {landmark.activity}
+                                </p>
+                              </div>
+
+                              <AnimatePresence>
+                                {showTradeRoute && (
+                                  <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    className="bg-amber-950/5 border border-amber-500/15 p-3 rounded-xl space-y-1 overflow-hidden"
+                                  >
+                                    <span className="font-mono text-[9px] font-bold text-amber-800 uppercase tracking-widest flex items-center gap-1">
+                                      <Compass className="w-3.5 h-3.5 text-amber-600 animate-pulse" /> 19th-C. Commerce & Resistance
+                                    </span>
+                                    <p className="text-[11px] text-stone-700 font-medium leading-relaxed">
+                                      Prior to industrial imports, salt from Okpoama forest wells fueled regional commerce. Indigenous merchant fleets navigated these winding waterways to deliver salt slabs to the Brass River Estuary, mounting fierce resistance against oppressive 19th-century colonial blockades and tax structures.
+                                    </p>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+
+                              {/* Live Climate widget */}
+                              <div className="pt-3 border-t border-stone-200/65">
+                                <LiveClimateWidget />
+                              </div>
                             </div>
-
-                            <AnimatePresence>
-                              {showTradeRoute && (
-                                <motion.div
-                                  initial={{ opacity: 0, height: 0 }}
-                                  animate={{ opacity: 1, height: "auto" }}
-                                  exit={{ opacity: 0, height: 0 }}
-                                  className="bg-amber-950/5 border border-amber-500/15 p-3 rounded-xl space-y-1 overflow-hidden"
-                                >
-                                  <span className="font-mono text-[9px] font-bold text-amber-800 uppercase tracking-widest flex items-center gap-1">
-                                    <Compass className="w-3.5 h-3.5 text-amber-600 animate-pulse" /> 19th-C. Commerce & Resistance
-                                  </span>
-                                  <p className="text-[11px] text-stone-700 font-medium leading-relaxed">
-                                    Prior to industrial imports, salt from Okpoama forest wells fueled regional commerce. Indigenous merchant fleets navigated these winding waterways to deliver salt slabs to the Brass River Estuary, mounting fierce resistance against oppressive 19th-century colonial blockades and tax structures.
-                                  </p>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
                           </div>
-                        </div>
 
-                        {/* Interactive Trigger that ties to other features! */}
-                        <div className="pt-4 border-t border-stone-200 mt-6">
-                          <button
-                            onClick={() => {
-                              if (landmark.id === 'salt_wells') {
-                                setActiveTab('ecotourism');
-                              } else if (landmark.id === 'okpoama_town') {
-                                setActiveTab('culture');
-                              } else if (landmark.id === 'brass_river') {
-                                setActiveTab('culture');
-                              } else if (landmark.id === 'okpoama_beaches') {
-                                setActiveTab('ecotourism');
-                              } else {
-                                setActiveTab('ecotourism');
-                              }
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                            }}
-                            className="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-md shadow-amber-600/10"
-                          >
-                            Explore This Site <Compass className="w-4 h-4 animate-pulse" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })()}
+                          {/* Interactive Trigger that ties to other features! */}
+                          <div className="pt-4 border-t border-stone-200 mt-6">
+                            <button
+                              onClick={() => {
+                                if (landmark.id === 'salt_wells') {
+                                  setActiveTab('ecotourism');
+                                } else if (landmark.id === 'okpoama_town') {
+                                  setActiveTab('culture');
+                                } else if (landmark.id === 'brass_river') {
+                                  setActiveTab('culture');
+                                } else if (landmark.id === 'okpoama_beaches') {
+                                  setActiveTab('ecotourism');
+                                } else {
+                                  setActiveTab('ecotourism');
+                                }
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-md shadow-amber-600/10"
+                            >
+                              Explore This Site <Compass className="w-4 h-4 animate-pulse" />
+                            </button>
+                          </div>
+                        </motion.div>
+                      );
+                    })()}
+                  </AnimatePresence>
                 </div>
               </div>
             </div>

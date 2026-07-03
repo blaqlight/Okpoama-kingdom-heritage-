@@ -87,3 +87,15 @@ export interface MuseumArtifact {
   audioGuideText: string;
 }
 
+export interface WeatherData {
+  temp: number;
+  condition: string;
+  humidity: number;
+  windSpeed: number;
+  windDirection: string;
+  icon: 'clear' | 'rain' | 'cloud' | 'mist' | string;
+  isDemo: boolean;
+  lastUpdated: string;
+  location: string;
+}
+
